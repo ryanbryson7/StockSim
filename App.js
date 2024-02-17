@@ -1,16 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { StyleSheet, Text, View, Button, TextInput, Pressable} from 'react-native';
 import axios from 'axios';
 
 export default function App() {
-  const [name, setName] = useState('shaun');
-  const [age, setAge] = useState('30');
-  const [stockPrice, setStockPrice] = useState('0');
-  const [stockName, setStockName] = useState('');
+  const [name, setName] = React.useState('shaun');
+  const [age, setAge] = React.useState('30');
+  const [stockPrice, setStockPrice] = React.useState('0');
+  const [availableFunds, setAvailableFunds] = React.useState(1000);
 
   const getStockFromApiAsync = async (nameIn) => {
-    const stockUrl = 'https://realstonks.p.rapidapi.com/' + stockName;
+    const stockUrl = 'https://realstonks.p.rapidapi.com/' + nameIn;
     console.log(stockUrl);
     const options = {
       method: 'GET',
@@ -30,22 +32,98 @@ export default function App() {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text>Enter stock to find:</Text>
-      <TextInput 
-        multiline
-        style={styles.input}
-        placeholder='e.g. TSLA'
-        onChangeText={newStockName => setStockName(newStockName)}
+  const buyStock = (stockSymbol, stockPrice) => {
+    setAvailableFunds(availableFunds - stockPrice);
+  }
+
+  const sellStock = (stockSymbol, stockPrice) => {
+    setAvailableFunds(availableFunds + stockPrice);
+  }
+
+  const HomeScreen = ({navigation}) => {
+    return (
+      <View>
+        <Text>Available Funds: {availableFunds}</Text>
+        <Button
+          title="View AAPL Stock"
+          onPress={() => 
+            navigation.navigate('Stock', {stock: 'AAPL'})
+          }
         />
-      <Button 
-        style={styles.button}
-        onPress={() => getStockFromApiAsync()}
-      />
-      <Text>Stock Price for {stockName}: {stockPrice}</Text>
-      <StatusBar style="auto" />
-    </View>
+        <Button
+          title="View TSLA Stock"
+          onPress={() => 
+            navigation.navigate('Stock', {stock: 'TSLA'})
+          }
+        />
+        <Button
+          title="View NFLX Stock"
+          onPress={() => 
+            navigation.navigate('Stock', {stock: 'NFLX'})
+          }
+        />
+        <Button
+          title="View MU Stock"
+          onPress={() => 
+            navigation.navigate('Stock', {stock: 'MU'})
+          }
+        />
+      </View>
+    )
+  }
+
+  const StockScreen = ({navigation, route}) => {
+    getStockFromApiAsync(route.params.stock);
+    return (
+      <View style={styles.container} name={route.params.stock}>
+        <Text>Available Funds: {availableFunds}</Text>
+        <View style={styles.buySellRow}>
+          <Text>{stockPrice}</Text>
+          <Pressable
+            style={styles.button}
+            onPress={() => buyStock(route.params.stock, stockPrice)}
+          >
+            <Text>Buy</Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => sellStock(route.params.stock, stockPrice)}
+          >
+            <Text>Sell</Text>
+          </Pressable>
+        </View>
+        <Pressable
+          title='Refresh'
+          onPress={() => getStockFromApiAsync(route.params.stock)}
+          style={styles.refreshButton}
+        >
+          <Text style={styles.refreshButtonText}>Refresh</Text>
+        </Pressable>
+        <StatusBar style="auto" />
+      </View>
+    );
+  }
+
+  const Stack = createNativeStackNavigator();
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{title: 'StockSim'}}
+        />
+        <Stack.Screen 
+          name="Stock"
+          component={StockScreen} 
+          options={({ route }) => ({ 
+            title: route.params.stock,
+            headerTitle: "hello",
+          })} 
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -55,15 +133,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    height: '100%',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#777',
-    padding: 8,
-    margin: 10,
-    width: 100,
-    height: 40,
+  buySellRow: {
+    flex: 1,
+    flexDirection: 'row',
+    maxHeight: '10%',
+    margin: 20,
+    padding: 20,
+    backgroundColor: 'grey',
+    alignItems: 'center',
   },
   button: {
+    height: 50,
+    margin: 20,
+    padding: 20,
+    backgroundColor: 'limegreen',
+    borderRadius: '25%',
+    alignItems: 'center',
   },
+  refreshButton: {
+    maxHeight: '10%',
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: '25%',
+  },
+  refreshButtonText: {
+    color: 'white',
+  }
 });

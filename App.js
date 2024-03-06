@@ -18,7 +18,7 @@ export default function App() {
       method: 'GET',
       url: stockUrl,
       headers: {
-        'X-RapidAPI-Key': 'YOUR-API-KEY',
+        'X-RapidAPI-Key': '<YOUR_API_KEY>',
         'X-RapidAPI-Host': 'realstonks.p.rapidapi.com'
       }
     };
@@ -40,34 +40,47 @@ export default function App() {
     setAvailableFunds(availableFunds + stockPrice);
   }
 
-  const HomeScreen = ({navigation}) => {
+
+  const DashboardScreen = ({navigation}) => {
     return (
-      <View>
-        <Text>Available Funds: {availableFunds}</Text>
-        <Button
+      <View className="bg-slate-900 h-full">
+        <Text className="text-sky-500 text-3xl text-center m-5">Available Funds: {availableFunds}</Text>
+        <Pressable
+          className="text-center bg-sky-500 p-5 my-2 mx-5 rounded-lg"
           title="View AAPL Stock"
           onPress={() => 
             navigation.navigate('Stock', {stock: 'AAPL'})
           }
-        />
-        <Button
+          >
+          <Text className="text-lg text-center">AAPL</Text>
+        </Pressable>
+        <Pressable
+          className="align-middle bg-sky-500 p-5 my-2 mx-5 rounded-lg"
           title="View TSLA Stock"
           onPress={() => 
             navigation.navigate('Stock', {stock: 'TSLA'})
           }
-        />
-        <Button
+          >
+          <Text className="text-lg text-center">TSLA</Text>
+        </Pressable>
+        <Pressable
+          className="text-center bg-sky-500 p-5 my-2 mx-5 rounded-lg"
           title="View NFLX Stock"
           onPress={() => 
             navigation.navigate('Stock', {stock: 'NFLX'})
           }
-        />
-        <Button
+        >
+          <Text className="text-lg text-center">NFLX</Text>
+        </Pressable>
+        <Pressable
+          className="text-center bg-sky-500 p-5 my-2 mx-5 rounded-lg"
           title="View MU Stock"
           onPress={() => 
             navigation.navigate('Stock', {stock: 'MU'})
           }
-        />
+          >
+          <Text className="text-lg text-center">MU</Text>
+        </Pressable>
       </View>
     )
   }
@@ -75,29 +88,32 @@ export default function App() {
   const StockScreen = ({navigation, route}) => {
     getStockFromApiAsync(route.params.stock);
     return (
-      <View style={styles.container} name={route.params.stock}>
-        <Text>Available Funds: {availableFunds}</Text>
-        <View style={styles.buySellRow}>
-          <Text>{stockPrice}</Text>
-          <Pressable
-            style={styles.button}
+      <View 
+        name={route.params.stock}
+        className="bg-slate-900 h-full"
+      >
+        <Text className="text-sky-500 text-3xl text-center m-5">Available Funds: {availableFunds}</Text>
+        <Text className="text-sky-300 text-xl text-center m-5">{stockPrice}</Text>
+
+        <View className="flex-row justify-evenly mb-10">
+           <Pressable
+            className="text-center bg-sky-500 p-5 my-2 mx-5 rounded-lg"
             onPress={() => buyStock(route.params.stock, stockPrice)}
           >
-            <Text>Buy</Text>
+            <Text className="text-black text-lg text-center">Buy</Text>
           </Pressable>
           <Pressable
-            style={styles.button}
+            className="text-center bg-sky-500 p-5 my-2 mx-5 rounded-lg"
             onPress={() => sellStock(route.params.stock, stockPrice)}
           >
-            <Text>Sell</Text>
+            <Text className="text-black text-lg text-center">Sell</Text>
           </Pressable>
         </View>
         <Pressable
           title='Refresh'
           onPress={() => getStockFromApiAsync(route.params.stock)}
-          style={styles.refreshButton}
         >
-          <Text style={styles.refreshButtonText}>Refresh</Text>
+          <Text className="text-sky-500 text-lg text-center">Refresh</Text>
         </Pressable>
         <StatusBar style="auto" />
       </View>
@@ -110,16 +126,15 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{title: 'StockSim'}}
+          name="Dashboard"
+          component={DashboardScreen}
+          options={{title: 'Dashboard'}}
         />
         <Stack.Screen 
           name="Stock"
           component={StockScreen} 
           options={({ route }) => ({ 
-            title: route.params.stock,
-            headerTitle: "hello",
+            headerTitle: route.params.stock,
           })} 
         />
       </Stack.Navigator>
@@ -127,38 +142,38 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-  },
-  buySellRow: {
-    flex: 1,
-    flexDirection: 'row',
-    maxHeight: '10%',
-    margin: 20,
-    padding: 20,
-    backgroundColor: 'grey',
-    alignItems: 'center',
-  },
-  button: {
-    height: 50,
-    margin: 20,
-    padding: 20,
-    backgroundColor: 'limegreen',
-    borderRadius: '25%',
-    alignItems: 'center',
-  },
-  refreshButton: {
-    maxHeight: '10%',
-    backgroundColor: 'blue',
-    padding: 10,
-    borderRadius: '25%',
-  },
-  refreshButtonText: {
-    color: 'white',
-  }
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     height: '100%',
+//   },
+//   buySellRow: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     maxHeight: '10%',
+//     margin: 20,
+//     padding: 20,
+//     backgroundColor: 'grey',
+//     alignItems: 'center',
+//   },
+//   button: {
+//     height: 50,
+//     margin: 20,
+//     padding: 20,
+//     backgroundColor: 'limegreen',
+//     borderRadius: '25%',
+//     alignItems: 'center',
+//   },
+//   refreshButton: {
+//     maxHeight: '10%',
+//     backgroundColor: 'blue',
+//     padding: 10,
+//     borderRadius: '25%',
+//   },
+//   refreshButtonText: {
+//     color: 'white',
+//   }
+// });
